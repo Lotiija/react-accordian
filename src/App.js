@@ -1,23 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import data from "./data.js";
 
 function App() {
+  const [selected, setSelected] = useState(null);
+  const [enableMultiSelection, setEnableMultiSelection] = useState(false);
+  const [multiple, setMultiple] = useState([]);
+
+  const handleSingleSelection = (getCurrentId) => {
+    setSelected(getCurrentId === selected ? null : getCurrentId);
+  };
+
+  const handleMultiSelection = (getCurrentId) => {
+    let cpyMultiple = [...multiple];
+    const findIndexOfCurrentId = cpyMultiple.indexOf(getCurrentId);
+
+    if (findIndexOfCurrentId === -1) cpyMultiple.push(getCurrentId);
+    else cpyMultiple.splice(findIndexOfCurrentId, 1);
+
+    setMultiple(cpyMultiple);
+  };
+
+  console.log(selected, multiple);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="wrapper">
+      <button onClick={() => setEnableMultiSelection(!enableMultiSelection)}>
+        Enable Multi Selection
+      </button>
+      <div className="accordian">
+        {data && data.length > 0 ? (
+          data.map((dataItem) => (
+            <div className="item">
+              <div
+                onClick={
+                  enableMultiSelection
+                    ? () => handleMultiSelection(dataItem.id)
+                    : () => handleSingleSelection(dataItem.id)
+                }
+                className="title"
+              >
+                <h3>{dataItem.question}</h3>
+                <span>+</span>
+              </div>
+              {selected === dataItem.id ||
+              multiple.indexOf(dataItem.id) !== -1 ? (
+                <div className="content">{dataItem.answer}</div>
+              ) : null}
+            </div>
+          ))
+        ) : (
+          <div>No data found</div>
+        )}
+      </div>
     </div>
   );
 }
